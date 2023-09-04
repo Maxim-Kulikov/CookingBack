@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  recipes:
+    image: postgres
+    environment:
+      - "POSTGRES_DB=recipes"
+      - "POSTGRES_PASSWORD=pass"
+      - "POSTGRES_USER=recipes"
+    ports:
+      - "5432:5432"
+  recipes_info:
+    image: mongo
+    ports:
+      - "28017:27017"
