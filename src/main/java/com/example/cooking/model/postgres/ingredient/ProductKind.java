@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -21,4 +22,8 @@ public class ProductKind {
 
     @Column(name = "name", nullable = false)
     private String name;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_product_kind")
+    private List<IngredientKind> ingredientKinds;
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -25,4 +26,8 @@ public class IngredientType {
     @ManyToOne
     @JoinColumn(name = "id_ingredient_kind", referencedColumnName = "id")
     private IngredientKind ingredientKind;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_ingredient_type")
+    private List<Ingredient> ingredients;
 }
