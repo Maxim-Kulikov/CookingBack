@@ -1,11 +1,9 @@
 package com.example.cooking.model.postgres.dish;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -19,11 +17,16 @@ public class DishName {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
     @ManyToOne
     @JoinColumn(name = "id_dish_type", referencedColumnName = "id")
     private DishType dishType;
+
+    @ToString.Exclude
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id")
+    private List<Dish> dishes;
 
 }

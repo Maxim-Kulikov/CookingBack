@@ -1,6 +1,6 @@
 package com.example.cooking.model.mongo;
 
-import com.example.cooking.dto.ingredient.resp.UsedIngredientForMongo;
+import com.example.cooking.dto.ingredient.UsedIngredient;
 import com.example.cooking.dto.photo.Photo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +19,6 @@ import java.util.List;
 public class RecipeInfo {
     @Id
     private String id;
-    private Integer idRecipe;
-    private List<UsedIngredientForMongo> usedIngredients;
+    private List<UsedIngredient> usedIngredients;
     private Photo photo;
 }

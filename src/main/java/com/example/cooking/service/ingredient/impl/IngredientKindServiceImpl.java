@@ -1,35 +1,33 @@
 package com.example.cooking.service.ingredient.impl;
 
+import com.example.cooking.dto.Query;
 import com.example.cooking.dto.ingredient.req.CreateIngredientKindReq;
 import com.example.cooking.dto.ingredient.req.UpdateIngredientKindReq;
 import com.example.cooking.dto.ingredient.resp.IngredientKindResp;
+import com.example.cooking.dto.ingredient.resp.IngredientTypeResp;
 import com.example.cooking.exception.ingredient.IngredientKindIsExistedException;
 import com.example.cooking.exception.ingredient.IngredientKindNotFoundException;
-import com.example.cooking.exception.ingredient.ProductKindNotFoundException;
 import com.example.cooking.mapper.ingredient.IngredientReqMapper;
 import com.example.cooking.mapper.ingredient.IngredientRespMapper;
 import com.example.cooking.model.postgres.ingredient.IngredientKind;
 import com.example.cooking.model.postgres.ingredient.ProductKind;
-import com.example.cooking.repository.postgres.ingredient.IngredientKindDao;
-import com.example.cooking.repository.postgres.ingredient.ProductKindDao;
+import com.example.cooking.repository.postgres.ingredient.IngredientKindRepository;
 import com.example.cooking.service.ingredient.IngredientKindService;
-import lombok.NonNull;
+import com.example.cooking.util.DataValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import java.util.List;
 import java.util.Optional;
 
-@Validated
 @Service
 public class IngredientKindServiceImpl implements IngredientKindService {
     @Autowired
-    private IngredientKindDao ingredientKindDao;
+    private IngredientKindRepository repository;
 
     @Autowired
-    private ProductKindDao productKindDao;
+    private ProductKindServiceImpl productKindService;
 
     @Autowired
     private IngredientReqMapper reqMapper;
@@ -37,67 +35,78 @@ public class IngredientKindServiceImpl implements IngredientKindService {
     @Autowired
     private IngredientRespMapper respMapper;
 
+    @Transactional
     @Override
-    public IngredientKindResp save(CreateIngredientKindReq req) throws ProductKindNotFoundException, IngredientKindIsExistedException {
+    public IngredientKindResp save(CreateIngredientKindReq req) {
         ifIngredientKindIsExistedThrowException(req.getKind());
 
         int idProductKind = req.getIdProductKind();
-        ProductKind productKind = getProductKindOrThrowException(idProductKind);
+        ProductKind productKind = productKindService.getProductKindOrThrowException(idProductKind);
 
         IngredientKind ingredientKind = reqMapper.toIngredientKind(req, productKind);
-        ingredientKindDao.save(ingredientKind);
+        repository.save(ingredientKind);
 
         return respMapper.toIngredientKindResp(ingredientKind);
     }
 
+    @Transactional
     @Override
-    public IngredientKindResp update(@NonNull @Min(0) @Max(30000) Integer id, UpdateIngredientKindReq req) throws IngredientKindIsExistedException, ProductKindNotFoundException, IngredientKindNotFoundException {
+    public IngredientKindResp update(Integer id, UpdateIngredientKindReq req) {
         IngredientKind ingredientKind = getIngredientKindOrThrowException(id);
 
-        Integer newIdProductKind = req.getIdProductKind();
-        Integer oldIdProductKind = ingredientKind.getProductKind().getId();
-        if (newIdProductKind != null && !newIdProductKind.equals(oldIdProductKind)) {
-            ingredientKind.setProductKind(getProductKindOrThrowException(newIdProductKind));
+        if (req.getIdProductKind() != null && !req.getIdProductKind().equals(ingredientKind.getProductKind().getId())) {
+            ingredientKind.setProductKind(productKindService.getProductKindOrThrowException(req.getIdProductKind()));
         }
 
-        String newKind = req.getKind();
-        String oldKind = ingredientKind.getKind();
-        if (newKind != null && !newKind.equals(oldKind)) {
-            ifIngredientKindIsExistedThrowException(newKind);
-            ingredientKind.setKind(newKind);
+        if (!DataValidator.isNullOrEmpty(req.getKind()) && !req.getKind().equals(ingredientKind.getKind())) {
+            ifIngredientKindIsExistedThrowException(req.getKind());
+            ingredientKind.setKind(req.getKind());
         }
 
-        ingredientKindDao.save(ingredientKind);
+        repository.save(ingredientKind);
         return respMapper.toIngredientKindResp(ingredientKind);
     }
 
+    @Transactional
     @Override
-    public void delete(@NonNull @Min(0) @Max(30000) Integer id) throws IngredientKindNotFoundException {
+    public void delete(Integer id) {
         getIngredientKindOrThrowException(id);
-        ingredientKindDao.deleteById(id);
+        repository.deleteById(id);
     }
 
+    @Transactional
     @Override
-    public IngredientKindResp findById(@NonNull @Min(0) @Max(30000) Integer id) throws IngredientKindNotFoundException {
+    public IngredientKindResp findById(Integer id) {
         return respMapper.toIngredientKindResp(getIngredientKindOrThrowException(id));
     }
 
-    private void ifIngredientKindIsExistedThrowException(String kind) throws IngredientKindIsExistedException {
-        Optional<IngredientKind> ingredientKindOptional = ingredientKindDao.findByKind(kind);
+    @Transactional
+    @Override
+    public List<IngredientTypeResp> findAllIngredientTypesById(Integer id) {
+        return respMapper.toIngredientTypeResps(
+                getIngredientKindOrThrowException(id).getIngredientTypes()
+        );
+    }
 
-        if (ingredientKindOptional.isPresent()) {
-            throw new IngredientKindIsExistedException(ingredientKindOptional.get().getId(), kind);
+    @Transactional
+    @Override
+    public List<IngredientKindResp> findAllByQuery(Query query) {
+        return respMapper.toIngredientKindResps(
+                DataValidator.isObjectOrFieldNull(query) ? (List<IngredientKind>) repository.findAll()
+                        : repository.findAllByKindContainsIgnoreCase(query.getQuery())
+        );
+    }
+
+    protected void ifIngredientKindIsExistedThrowException(String kind) {
+        Optional<IngredientKind> ingredientKind = repository.findByKind(kind);
+        if (ingredientKind.isPresent()) {
+            throw new IngredientKindIsExistedException(ingredientKind.get().getId(), kind);
         }
     }
 
-    private IngredientKind getIngredientKindOrThrowException(Integer id) throws IngredientKindNotFoundException {
-        return ingredientKindDao.findById(id)
+    protected IngredientKind getIngredientKindOrThrowException(Integer id) {
+        return repository.findById(id)
                 .orElseThrow(() -> new IngredientKindNotFoundException(id));
-    }
-
-    private ProductKind getProductKindOrThrowException(Integer id) throws ProductKindNotFoundException {
-        return productKindDao.findById(id)
-                .orElseThrow(() -> new ProductKindNotFoundException(id));
     }
 
 }

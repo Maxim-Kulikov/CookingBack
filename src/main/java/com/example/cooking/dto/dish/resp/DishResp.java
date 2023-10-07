@@ -24,8 +24,6 @@ public class DishResp {
     private Double fats;
     private Double carbohydrates;
 
-    private List<UsedIngredientResp> usedIngredients;
-
     private Integer idUser;
 
     private String idRecipeInfo;

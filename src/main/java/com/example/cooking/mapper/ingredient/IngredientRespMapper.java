@@ -41,4 +41,8 @@ public interface IngredientRespMapper {
     List<ProductKindResp> toProductKindResps(List<ProductKind> productKinds);
     List<IngredientKindResp> toIngredientKindResps(List<IngredientKind> ingredientKindResps);
 
+    List<IngredientTypeResp> toIngredientTypeResps(List<IngredientType> ingredientTypeResps);
+
+    List<IngredientResp> toIngredientResps(List<Ingredient> ingredientResps);
+
 }

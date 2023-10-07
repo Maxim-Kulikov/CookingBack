@@ -1,40 +1,44 @@
 package com.example.cooking.controller.ingredient;
 
+import com.example.cooking.dto.Query;
 import com.example.cooking.dto.ingredient.req.CreateIngredientReq;
 import com.example.cooking.dto.ingredient.req.UpdateIngredientReq;
 import com.example.cooking.dto.ingredient.resp.IngredientResp;
-import com.example.cooking.exception.ingredient.IngredientIsExistedException;
-import com.example.cooking.exception.ingredient.IngredientNotFoundException;
-import com.example.cooking.exception.ingredient.IngredientTypeNotFoundException;
 import com.example.cooking.service.ingredient.IngredientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/ingredients")
 public class IngredientController {
     @Autowired
-    private IngredientService service;
+    private IngredientService ingredientService;
 
     @PostMapping("/save")
-    public IngredientResp save(@RequestBody CreateIngredientReq req) throws IngredientTypeNotFoundException, IngredientIsExistedException {
-        return service.save(req);
+    public IngredientResp save(@RequestBody CreateIngredientReq req) {
+        return ingredientService.save(req);
     }
 
     @GetMapping("/{id}")
-    public IngredientResp findById(@PathVariable final int id) throws IngredientNotFoundException {
-        return service.findById(id);
+    public IngredientResp findById(@PathVariable int id) {
+        return ingredientService.findById(id);
     }
 
     @PatchMapping("/update/{id}")
-    public IngredientResp update(@PathVariable final int id,
-                                 @RequestBody UpdateIngredientReq req) throws IngredientNotFoundException, IngredientTypeNotFoundException {
-        return service.update(id, req);
+    public IngredientResp update(@PathVariable int id,
+                                 @RequestBody UpdateIngredientReq req) {
+        return ingredientService.update(id, req);
     }
 
     @DeleteMapping("/delete/{id}")
-    public void delete(@PathVariable final int id) throws IngredientNotFoundException {
-        service.delete(id);
+    public void delete(@PathVariable int id) {
+        ingredientService.delete(id);
     }
 
+    @PostMapping("")
+    public List<IngredientResp> findAllWithQuery(@RequestBody(required = false) Query query) {
+        return ingredientService.findAllByQuery(query);
+    }
 }

@@ -1,20 +1,16 @@
 package com.example.cooking.controller.ingredient;
 
+import com.example.cooking.dto.Query;
 import com.example.cooking.dto.ingredient.req.CreateIngredientTypeReq;
 import com.example.cooking.dto.ingredient.req.UpdateIngredientTypeReq;
+import com.example.cooking.dto.ingredient.resp.IngredientResp;
 import com.example.cooking.dto.ingredient.resp.IngredientTypeResp;
-import com.example.cooking.exception.ingredient.IngredientKindNotFoundException;
-import com.example.cooking.exception.ingredient.IngredientTypeIsExistedException;
-import com.example.cooking.exception.ingredient.IngredientTypeNotFoundException;
 import com.example.cooking.service.ingredient.IngredientTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Validated
 @RestController
@@ -24,25 +20,33 @@ public class IngredientTypeController {
     private IngredientTypeService service;
 
     @PostMapping("/save")
-    public IngredientTypeResp save(@RequestBody CreateIngredientTypeReq req) throws IngredientKindNotFoundException, IngredientTypeIsExistedException {
+    public IngredientTypeResp save(@RequestBody CreateIngredientTypeReq req) {
         return service.save(req);
     }
 
     @PatchMapping("/update/{id}")
-    public IngredientTypeResp update(@PathVariable final int id,
-                                     @RequestBody UpdateIngredientTypeReq req)
-            throws IngredientKindNotFoundException, IngredientTypeNotFoundException, IngredientTypeIsExistedException {
+    public IngredientTypeResp update(@PathVariable int id, @RequestBody UpdateIngredientTypeReq req) {
         return service.update(id, req);
     }
 
     @DeleteMapping("/delete/{id}")
-    public void delete(@PathVariable final int id) throws IngredientTypeNotFoundException {
+    public void delete(@PathVariable int id) {
         service.delete(id);
     }
 
     @GetMapping("/{id}")
-    public IngredientTypeResp findById(@PathVariable final int id) throws IngredientTypeNotFoundException {
+    public IngredientTypeResp findById(@PathVariable int id) {
         return service.findById(id);
+    }
+
+    @GetMapping("/{id}/ingredients")
+    public List<IngredientResp> findAllIngredientsById(@PathVariable int id) {
+        return service.findAllIngredientsById(id);
+    }
+
+    @PostMapping("")
+    public List<IngredientTypeResp> findAllWithQuery(@RequestBody(required = false) Query query) {
+        return service.findAllByQuery(query);
     }
 
 }

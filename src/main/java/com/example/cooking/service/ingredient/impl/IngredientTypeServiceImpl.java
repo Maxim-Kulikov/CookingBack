@@ -1,36 +1,33 @@
 package com.example.cooking.service.ingredient.impl;
 
+import com.example.cooking.dto.Query;
 import com.example.cooking.dto.ingredient.req.CreateIngredientTypeReq;
 import com.example.cooking.dto.ingredient.req.UpdateIngredientTypeReq;
+import com.example.cooking.dto.ingredient.resp.IngredientResp;
 import com.example.cooking.dto.ingredient.resp.IngredientTypeResp;
-import com.example.cooking.exception.ingredient.IngredientKindNotFoundException;
 import com.example.cooking.exception.ingredient.IngredientTypeIsExistedException;
 import com.example.cooking.exception.ingredient.IngredientTypeNotFoundException;
 import com.example.cooking.mapper.ingredient.IngredientReqMapper;
 import com.example.cooking.mapper.ingredient.IngredientRespMapper;
 import com.example.cooking.model.postgres.ingredient.IngredientKind;
 import com.example.cooking.model.postgres.ingredient.IngredientType;
-import com.example.cooking.repository.postgres.ingredient.IngredientKindDao;
-import com.example.cooking.repository.postgres.ingredient.IngredientTypeDao;
+import com.example.cooking.repository.postgres.ingredient.IngredientTypeRepository;
 import com.example.cooking.service.ingredient.IngredientTypeService;
-import lombok.NonNull;
+import com.example.cooking.util.DataValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import java.util.List;
 import java.util.Optional;
 
-@Validated
 @Service
 public class IngredientTypeServiceImpl implements IngredientTypeService {
     @Autowired
-    private IngredientTypeDao ingredientTypeDao;
+    private IngredientTypeRepository repository;
 
     @Autowired
-    private IngredientKindDao ingredientKindDao;
+    private IngredientKindServiceImpl ingredientKindService;
 
     @Autowired
     private IngredientReqMapper reqMapper;
@@ -38,71 +35,81 @@ public class IngredientTypeServiceImpl implements IngredientTypeService {
     @Autowired
     private IngredientRespMapper respMapper;
 
+    @Transactional
     @Override
-    public IngredientTypeResp save(CreateIngredientTypeReq req) throws IngredientKindNotFoundException, IngredientTypeIsExistedException {
+    public IngredientTypeResp save(CreateIngredientTypeReq req) {
         ifIngredientTypeIsExistedThrowException(req.getType());
 
         int idIngredientKind = req.getIdIngredientKind();
-        IngredientKind ingredientKind = ingredientKindDao.findById(idIngredientKind)
-                .orElseThrow(() -> new IngredientKindNotFoundException(idIngredientKind));
+        IngredientKind ingredientKind = ingredientKindService.getIngredientKindOrThrowException(idIngredientKind);
 
         IngredientType ingredientType = reqMapper.toIngredientType(req, ingredientKind);
-        ingredientTypeDao.save(ingredientType);
+        repository.save(ingredientType);
 
         return respMapper.toIngredientTypeResp(ingredientType);
     }
 
+    @Transactional
     @Override
-    public IngredientTypeResp update(@NonNull @Min(0) @Max(30000) Integer id, UpdateIngredientTypeReq req) throws IngredientTypeNotFoundException, IngredientTypeIsExistedException, IngredientKindNotFoundException {
+    public IngredientTypeResp update(Integer id, UpdateIngredientTypeReq req) {
         IngredientType ingredientType = getIngredientTypeOrThrowException(id);
 
-        String newType = req.getType();
-        String oldType = ingredientType.getType();
-        if (newType != null && !newType.isBlank() && !newType.equals(oldType)) {
-            ifIngredientTypeIsExistedThrowException(newType);
-            ingredientType.setType(newType);
+        if (!DataValidator.isNullOrEmpty(req.getType()) && !req.getType().equals(ingredientType.getType())) {
+            ifIngredientTypeIsExistedThrowException(req.getType());
+            ingredientType.setType(req.getType());
         }
 
-        Integer newIdIngredientKind = req.getIdIngredientKind();
-        Integer oldIdIngredientKind = ingredientType.getIngredientKind().getId();
-        if (newIdIngredientKind != null && !newIdIngredientKind.equals(oldIdIngredientKind)) {
-            IngredientKind ingredientKind = getIngredientKindOrThrowException(newIdIngredientKind);
+        if (req.getIdIngredientKind() != null &&
+                !req.getIdIngredientKind().equals(ingredientType.getIngredientKind().getId())) {
+            IngredientKind ingredientKind
+                    = ingredientKindService.getIngredientKindOrThrowException(req.getIdIngredientKind());
             ingredientType.setIngredientKind(ingredientKind);
         }
 
-        ingredientTypeDao.save(ingredientType);
+        repository.save(ingredientType);
         return respMapper.toIngredientTypeResp(ingredientType);
     }
 
+    @Transactional
     @Override
-    public void delete(@NonNull @Min(0) @Max(30000) Integer id) throws IngredientTypeNotFoundException {
+    public void delete(Integer id) {
         getIngredientTypeOrThrowException(id);
-        ingredientTypeDao.deleteById(id);
+        repository.deleteById(id);
     }
 
+    @Transactional
     @Override
-    public IngredientTypeResp findById(@NonNull @Min(0) @Max(30000) Integer id) throws IngredientTypeNotFoundException {
+    public IngredientTypeResp findById(Integer id) {
         return respMapper.toIngredientTypeResp(getIngredientTypeOrThrowException(id));
     }
 
-    /*public List<IngredientTypeResp> findAll() {
-        return respMapper.(List<IngredientTypeResp>) ingredientTypeDao.findAll()
+    @Transactional
+    @Override
+    public List<IngredientResp> findAllIngredientsById(Integer id) {
+        return respMapper.toIngredientResps(
+                getIngredientTypeOrThrowException(id).getIngredients()
+        );
     }
-*/
-    private IngredientType getIngredientTypeOrThrowException(int id) throws IngredientTypeNotFoundException {
-        return ingredientTypeDao.findById(id)
+
+    @Transactional
+    @Override
+    public List<IngredientTypeResp> findAllByQuery(Query query) {
+        return respMapper.toIngredientTypeResps(
+                DataValidator.isObjectOrFieldNull(query) ? (List<IngredientType>) repository.findAll()
+                        : repository.findAllByTypeContainsIgnoreCase(query.getQuery())
+        );
+    }
+
+    protected IngredientType getIngredientTypeOrThrowException(int id) {
+        return repository.findById(id)
                 .orElseThrow(() -> new IngredientTypeNotFoundException(id));
     }
 
-    private IngredientKind getIngredientKindOrThrowException(int id) throws IngredientKindNotFoundException {
-        return ingredientKindDao.findById(id)
-                .orElseThrow(() -> new IngredientKindNotFoundException(id));
-    }
-
-    private void ifIngredientTypeIsExistedThrowException(String type) throws IngredientTypeIsExistedException {
-        Optional<IngredientType> ingredientTypeOptional = ingredientTypeDao.findByType(type);
-        if (ingredientTypeOptional.isPresent()) {
-            throw new IngredientTypeIsExistedException(ingredientTypeOptional.get().getId(), type);
+    protected void ifIngredientTypeIsExistedThrowException(String type) {
+        Optional<IngredientType> ingredientType = repository.findByType(type);
+        if (ingredientType.isPresent()) {
+            throw new IngredientTypeIsExistedException(ingredientType.get().getId(), type);
         }
     }
+
 }

@@ -4,48 +4,78 @@ import com.example.cooking.dto.dish.resp.DishNameResp;
 import com.example.cooking.dto.dish.resp.DishResp;
 import com.example.cooking.dto.dish.resp.DishTypeResp;
 import com.example.cooking.dto.dish.resp.MealTimeResp;
-import com.example.cooking.dto.ingredient.resp.UsedIngredientResp;
 import com.example.cooking.model.postgres.dish.Dish;
 import com.example.cooking.model.postgres.dish.DishName;
 import com.example.cooking.model.postgres.dish.DishType;
 import com.example.cooking.model.postgres.dish.MealTime;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
-public interface DishRespMapper {
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "name", source = "name")
-    @Mapping(target = "idDishType", source = "dishType.id")
-    @Mapping(target = "dishType", source = "dishType.type")
-    @Mapping(target = "idMealTime", source = "dishType.mealTime.id")
-    @Mapping(target = "dayPart", source = "dishType.mealTime.dayPart")
-    DishNameResp toDishNameResp(DishName dishName);
+@Component
+public class DishRespMapper {
 
-    @Mapping(target = "id", source = "dish.id")
-    @Mapping(target = "idRecipeInfo", source = "dish.idRecipeInfo")
-    @Mapping(target = "idUser", source = "dish.idUser")
-    @Mapping(target = "idDishType", source = "dish.dishName.dishType.id")
-    @Mapping(target = "dishType", source = "dish.dishName.dishType.type")
-    @Mapping(target = "idDishName", source = "dish.dishName.id")
-    @Mapping(target = "dishName", source = "dish.dishName.name")
-    @Mapping(target = "idMealTime", source = "dish.dishName.dishType.mealTime.id")
-    @Mapping(target = "dayPart", source = "dish.dishName.dishType.mealTime.dayPart")
-    DishResp toDishResp(Dish dish, List<UsedIngredientResp> usedIngredients);
+    public DishNameResp toDishNameResp(DishName dishName) {
+        return DishNameResp.builder()
+                .id(dishName.getId())
+                .name(dishName.getName())
+                .idDishType(dishName.getDishType().getId())
+                .dishType(dishName.getDishType().getType())
+                .idMealTime(dishName.getDishType().getMealTime().getId())
+                .dayPart(dishName.getDishType().getMealTime().getDayPart())
+                .build();
+    }
 
+    public DishResp toDishResp(Dish dish) {
+        return DishResp.builder()
+                .id(dish.getId())
+                .cookingTime(dish.getCookingTime())
+                .idRecipeInfo(dish.getIdRecipeInfo())
+                .idUser(dish.getIdUser())
+                .idDishType(dish.getDishName().getDishType().getId())
+                .dishType(dish.getDishName().getDishType().getType())
+                .idDishName(dish.getDishName().getId())
+                .dishName(dish.getDishName().getName())
+                .idMealTime(dish.getDishName().getDishType().getMealTime().getId())
+                .dayPart(dish.getDishName().getDishType().getMealTime().getDayPart())
+                .calories(dish.getCalories())
+                .proteins(dish.getProteins())
+                .fats(dish.getFats())
+                .carbohydrates(dish.getCarbohydrates())
+                .build();
+    }
 
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "type", source = "type")
-    @Mapping(target = "idMealTime", source = "mealTime.id")
-    @Mapping(target = "dayPart", source = "mealTime.dayPart")
-    DishTypeResp toDishTypeResp(DishType dishType);
+    public DishTypeResp toDishTypeResp(DishType dishType) {
+        return DishTypeResp.builder()
+                .id(dishType.getId())
+                .type(dishType.getType())
+                .idMealTime(dishType.getMealTime().getId())
+                .dayPart(dishType.getMealTime().getDayPart())
+                .build();
+    }
 
-    MealTimeResp toMealTimeResp(MealTime mealTime);
+    public MealTimeResp toMealTimeResp(MealTime mealTime) {
+        return MealTimeResp.builder()
+                .id(mealTime.getId())
+                .dayPart(mealTime.getDayPart())
+                .build();
+    }
 
-/*    List<DishNameResp> toDishNameResps(List<DishName> dishNames);
-    List<DishResp> toDishResps(List<Dish> dishes);
-    List<DishTypeResp> toDishTypeResps(List<DishType> dishTypes);
-    List<MealTimeResp> toMealTimeResps(List<MealTime> mealTimes);*/
+    public List<DishNameResp> toDishNameResps(List<DishName> dishNames) {
+        return dishNames.stream().map(this::toDishNameResp).collect(Collectors.toList());
+    }
+
+    public List<DishTypeResp> toDishTypeResps(List<DishType> dishTypes) {
+        return dishTypes.stream().map(this::toDishTypeResp).collect(Collectors.toList());
+    }
+
+    public List<MealTimeResp> toMealTimeResps(List<MealTime> mealTimes) {
+        return mealTimes.stream().map(this::toMealTimeResp).collect(Collectors.toList());
+    }
+
+    public List<DishResp> toDishResps(List<Dish> dishes) {
+        return dishes.stream().map(this::toDishResp).collect(Collectors.toList());
+    }
+
 }

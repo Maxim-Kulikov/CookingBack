@@ -20,7 +20,7 @@ public class IngredientType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "type", nullable = false)
+    @Column(name = "type", nullable = false, unique = true)
     private String type;
 
     @ManyToOne

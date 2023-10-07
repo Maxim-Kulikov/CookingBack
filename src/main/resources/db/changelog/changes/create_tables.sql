@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS ingredient_type (
 
 CREATE TABLE IF NOT EXISTS ingredients (
     id serial primary key ,
+    ingredient_name varchar(45) not null,
     id_ingredient_type int not null,
     calories int not null,
     proteins int not null ,

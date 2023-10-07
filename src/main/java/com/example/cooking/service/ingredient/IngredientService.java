@@ -3,16 +3,8 @@ package com.example.cooking.service.ingredient;
 import com.example.cooking.dto.ingredient.req.CreateIngredientReq;
 import com.example.cooking.dto.ingredient.req.UpdateIngredientReq;
 import com.example.cooking.dto.ingredient.resp.IngredientResp;
-import com.example.cooking.exception.ingredient.IngredientIsExistedException;
-import com.example.cooking.exception.ingredient.IngredientNotFoundException;
-import com.example.cooking.exception.ingredient.IngredientTypeNotFoundException;
+import com.example.cooking.service.MainService;
 
-public interface IngredientService {
-    IngredientResp save(CreateIngredientReq req) throws IngredientTypeNotFoundException, IngredientIsExistedException;
+public interface IngredientService extends MainService<CreateIngredientReq, UpdateIngredientReq, IngredientResp> {
 
-    IngredientResp update(Integer id, UpdateIngredientReq req) throws IngredientTypeNotFoundException, IngredientNotFoundException;
-
-    void delete(Integer id) throws IngredientNotFoundException;
-
-    IngredientResp findById(Integer id) throws IngredientNotFoundException;
 }

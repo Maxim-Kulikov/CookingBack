@@ -1,11 +1,9 @@
 package com.example.cooking.model.postgres.dish;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -22,14 +20,26 @@ public class Dish {
     @Column(name = "id_user", nullable = false)
     private Integer idUser;
 
-    @OneToOne
-    @JoinColumn(name = "id_dish_name", referencedColumnName = "id")
-    private DishName dishName;
-
     @Column(name = "cooking_time", nullable = false)
     private Integer cookingTime;
 
     @Column(name = "id_recipe_info", nullable = false)
     private String idRecipeInfo;
+
+    @Column(name = "calories", nullable = false)
+    private Double calories;
+
+    @Column(name = "proteins", nullable = false)
+    private Double proteins;
+
+    @Column(name = "fats", nullable = false)
+    private Double fats;
+
+    @Column(name = "carbohydrates", nullable = false)
+    private Double carbohydrates;
+
+    @ManyToOne
+    @JoinColumn(name = "id_dish_name", referencedColumnName = "id")
+    private DishName dishName;
 
 }

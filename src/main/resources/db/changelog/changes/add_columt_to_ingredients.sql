@@ -1,1 +1,0 @@
-alter table ingredients add column ingredient_name varchar(45) not null
