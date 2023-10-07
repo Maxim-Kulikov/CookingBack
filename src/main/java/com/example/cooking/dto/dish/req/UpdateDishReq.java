@@ -18,6 +18,8 @@ public class UpdateDishReq {
     @Min(1)
     @Max(30000)
     private Integer idUser;
+    
+    private String name;
 
     @Min(1)
     @Max(30000)

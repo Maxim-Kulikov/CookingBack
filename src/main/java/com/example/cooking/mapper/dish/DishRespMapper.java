@@ -30,6 +30,7 @@ public class DishRespMapper {
     public DishResp toDishResp(Dish dish) {
         return DishResp.builder()
                 .id(dish.getId())
+                .name(dish.getName())
                 .cookingTime(dish.getCookingTime())
                 .idRecipeInfo(dish.getIdRecipeInfo())
                 .idUser(dish.getIdUser())

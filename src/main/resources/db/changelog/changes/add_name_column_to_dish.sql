@@ -1,0 +1,1 @@
+ALTER TABLE dishes ADD name varchar(45) not null;

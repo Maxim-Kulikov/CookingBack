@@ -18,6 +18,7 @@ import java.util.List;
 @Builder
 public class DishResp {
     private Integer id;
+    private String name;
     private Integer cookingTime;
     private Double calories;
     private Double proteins;
