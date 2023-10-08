@@ -13,9 +13,9 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface DishReqMapper {
-    @Mapping(target = "id", ignore = true)
+    /*@Mapping(target = "id", ignore = true)
     Dish toDish(CreateDishReq req, DishName dishName, Integer idRecipeInfo, Integer idUser);
-
+*/
     @Mapping(target = "id", ignore = true)
     DishName toDishName(CreateDishNameReq req, DishType dishType);
 

@@ -10,9 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface IngredientTypeRepository extends CrudRepository<IngredientType, Integer> {
-    boolean existsByType(String type);
-
-    Optional<IngredientType> findByType(String type);
+    Optional<IngredientType> findByTypeIgnoreCase(String type);
 
     List<IngredientType> findAllByTypeContainsIgnoreCase(String type);
 }

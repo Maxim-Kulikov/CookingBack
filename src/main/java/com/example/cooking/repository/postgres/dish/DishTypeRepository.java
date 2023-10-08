@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface DishTypeRepository extends CrudRepository<DishType, Integer> {
     List<DishType> findAllByTypeContainsIgnoreCase(String type);
 
-    Optional<DishType> findFirstByType(String type);
+    Optional<DishType> findFirstByTypeIgnoreCaseAndMealTimeId(String type, Integer mealTimeId);
 }

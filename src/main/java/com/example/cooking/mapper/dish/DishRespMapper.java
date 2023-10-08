@@ -4,6 +4,8 @@ import com.example.cooking.dto.dish.resp.DishNameResp;
 import com.example.cooking.dto.dish.resp.DishResp;
 import com.example.cooking.dto.dish.resp.DishTypeResp;
 import com.example.cooking.dto.dish.resp.MealTimeResp;
+import com.example.cooking.dto.photo.Photo;
+import com.example.cooking.model.mongo.RecipeInfo;
 import com.example.cooking.model.postgres.dish.Dish;
 import com.example.cooking.model.postgres.dish.DishName;
 import com.example.cooking.model.postgres.dish.DishType;
@@ -27,12 +29,11 @@ public class DishRespMapper {
                 .build();
     }
 
-    public DishResp toDishResp(Dish dish) {
+    public DishResp toDishResp(Dish dish, RecipeInfo recipeInfo) {
         return DishResp.builder()
                 .id(dish.getId())
                 .name(dish.getName())
                 .cookingTime(dish.getCookingTime())
-                .idRecipeInfo(dish.getIdRecipeInfo())
                 .idUser(dish.getIdUser())
                 .idDishType(dish.getDishName().getDishType().getId())
                 .dishType(dish.getDishName().getDishType().getType())
@@ -44,6 +45,8 @@ public class DishRespMapper {
                 .proteins(dish.getProteins())
                 .fats(dish.getFats())
                 .carbohydrates(dish.getCarbohydrates())
+                .photo(recipeInfo.getPhoto())
+                .usedIngredients(recipeInfo.getUsedIngredients())
                 .build();
     }
 
@@ -73,10 +76,6 @@ public class DishRespMapper {
 
     public List<MealTimeResp> toMealTimeResps(List<MealTime> mealTimes) {
         return mealTimes.stream().map(this::toMealTimeResp).collect(Collectors.toList());
-    }
-
-    public List<DishResp> toDishResps(List<Dish> dishes) {
-        return dishes.stream().map(this::toDishResp).collect(Collectors.toList());
     }
 
 }

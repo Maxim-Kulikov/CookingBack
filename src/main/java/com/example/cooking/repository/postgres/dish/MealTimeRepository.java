@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface MealTimeRepository extends CrudRepository<MealTime, Integer> {
-    Optional<MealTime> findByDayPart(String dayPart);
+    Optional<MealTime> findByDayPartIgnoreCase(String dayPart);
 
     List<MealTime> findAllByDayPartContainsIgnoreCase(String dayPart);
 }

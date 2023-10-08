@@ -11,9 +11,7 @@ import java.util.stream.Collectors;
 
 @Repository
 public interface ProductKindRepository extends CrudRepository<ProductKind, Integer> {
-    boolean existsByName(String name);
-
-    Optional<ProductKind> findByName(String name);
+    Optional<ProductKind> findByNameIgnoreCase(String name);
 
     List<ProductKind> findAllByNameContainsIgnoreCase(String name);
 

@@ -2,12 +2,13 @@ package com.example.cooking.service.dish.impl;
 
 import com.example.cooking.dto.Query;
 import com.example.cooking.dto.dish.req.CreateDishReq;
+import com.example.cooking.dto.dish.req.DishFilterReq;
+import com.example.cooking.dto.dish.req.SortOrder;
 import com.example.cooking.dto.dish.req.UpdateDishReq;
 import com.example.cooking.dto.dish.resp.DishResp;
 import com.example.cooking.dto.ingredient.UsedIngredient;
 import com.example.cooking.exception.dish.DishNotFoundException;
 import com.example.cooking.exception.dish.RecipeInfoNotFoundException;
-import com.example.cooking.mapper.dish.DishReqMapper;
 import com.example.cooking.mapper.dish.DishRespMapper;
 import com.example.cooking.model.mongo.RecipeInfo;
 import com.example.cooking.model.postgres.dish.Dish;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class DishServiceImpl implements DishService {
@@ -44,9 +46,6 @@ public class DishServiceImpl implements DishService {
     private DishNameServiceImpl dishNameService;
 
     @Autowired
-    private DishReqMapper reqMapper;
-
-    @Autowired
     private DishRespMapper respMapper;
 
     @Transactional
@@ -60,17 +59,17 @@ public class DishServiceImpl implements DishService {
                 .photo(req.getPhoto())
                 .build());
 
-        Dish dish = dishRepository.save(Dish.builder()
+        Dish dish = Dish.builder()
                 .name(req.getName())
                 .dishName(dishName)
                 .idUser(req.getIdUser())
                 .idRecipeInfo(recipeInfo.getId())
                 .cookingTime(req.getCookingTime())
-                .build());
-
+                .build();
         setNutritionalIn100GramsToDish(dish, nutritional);
 
-        return respMapper.toDishResp(dish);
+        dishRepository.save(dish);
+        return respMapper.toDishResp(dish, recipeInfo);
     }
 
     @Transactional
@@ -83,7 +82,7 @@ public class DishServiceImpl implements DishService {
             dish.setDishName(dishNameService.getDishNameOrThrowException(req.getIdDishName()));
         }
 
-        if(req.getUsedIngredients() != null && !req.getUsedIngredients().isEmpty()) {
+        if (req.getUsedIngredients() != null && !req.getUsedIngredients().isEmpty()) {
             Nutritional nutritional = getNutritional(req.getUsedIngredients());
             setNutritionalIn100GramsToDish(dish, nutritional);
             recipeInfo.setUsedIngredients(req.getUsedIngredients());
@@ -97,32 +96,42 @@ public class DishServiceImpl implements DishService {
             dish.setCookingTime(req.getCookingTime());
         }
 
-        if(req.getIdUser() != null) {
+        if (req.getIdUser() != null) {
             dish.setIdUser(req.getIdUser());
         }
 
         dishRepository.save(dish);
         recipeInfoRepository.save(recipeInfo);
 
-        return respMapper.toDishResp(dish);
+        return respMapper.toDishResp(dish, recipeInfo);
     }
 
     @Transactional
     @Override
     public void delete(Integer id) {
-
+        String recipeInfoId = getDishOrThrowException(id).getIdRecipeInfo();
+        dishRepository.deleteById(id);
+        recipeInfoRepository.deleteById(recipeInfoId);
     }
 
     @Transactional
     @Override
     public DishResp findById(Integer id) {
-        return null;
+        Dish dish = getDishOrThrowException(id);
+        RecipeInfo recipeInfo = getRecipeInfoOrThrowException(dish.getIdRecipeInfo());
+        return respMapper.toDishResp(dish, recipeInfo);
     }
 
     @Transactional
     @Override
     public List<DishResp> findAllByQuery(Query query) {
-        return null;
+        return (DataValidator.isObjectOrFieldNull(query) ? (List<Dish>) dishRepository.findAll()
+                : dishRepository.findAllByNameContainsIgnoreCase(query.getQuery()))
+                .stream()
+                .map(dish ->
+                        respMapper.toDishResp(dish,
+                                recipeInfoRepository.findById(dish.getIdRecipeInfo()).orElseGet(RecipeInfo::new)))
+                .collect(Collectors.toList());
     }
 
     private Nutritional getNutritional(List<UsedIngredient> usedIngredients) {
@@ -145,10 +154,10 @@ public class DishServiceImpl implements DishService {
 
     private void setNutritionalIn100GramsToDish(Dish dish, Nutritional nutritional) {
         Nutritional nutritionalIn100Grams = nutritional.getNutritionalIn100Grams();
-        dish.setCalories(nutritionalIn100Grams.calories);
-        dish.setProteins(nutritionalIn100Grams.proteins);
-        dish.setFats(nutritional.fats);
-        dish.setCarbohydrates(nutritional.carbohydrates);
+        dish.setCalories(nutritionalIn100Grams.getCalories());
+        dish.setProteins(nutritionalIn100Grams.getProteins());
+        dish.setFats(nutritional.getFats());
+        dish.setCarbohydrates(nutritional.getCarbohydrates());
     }
 
     private void changeNutritional(UsedIngredient usedIngredient, Nutritional nutritional) {
@@ -159,6 +168,34 @@ public class DishServiceImpl implements DishService {
         nutritional.addFats(ingredient.getFats() * weightIndex);
         nutritional.addCarbohydrates(ingredient.getCarbohydrates() * weightIndex);
         nutritional.addWeight(usedIngredient.getWeight());
+    }
+
+    @Transactional
+    @Override
+    public List<DishResp> findAllByFilter(DishFilterReq req) {
+        return dishRepository.findAllWithFilter(
+                        req.getQuery(),
+                        req.getMinCalories(), req.getMaxCalories(), req.getMinProteins(), req.getMaxProteins(),
+                        req.getMinFats(), req.getMaxFats(), req.getMinCarbohydrates(), req.getMaxCarbohydrates(),
+                        req.getMinCookingTime(), req.getMaxCookingTime(),
+                        req.getUserIds()
+                )
+                .stream()
+                .sorted((o1, o2) -> {
+                    int result = 0;
+                    switch (req.getSortField()) {
+                        case CALORIES -> result = o1.getCalories().compareTo(o2.getCalories());
+                        case PROTEINS -> result = o1.getProteins().compareTo(o2.getProteins());
+                        case FATS -> result = o1.getFats().compareTo(o2.getFats());
+                        case CARBOHYDRATES -> result = o1.getCarbohydrates().compareTo(o2.getCarbohydrates());
+                        case COOKING_TIME -> result = o1.getCookingTime().compareTo(o2.getCookingTime());
+                        default -> result = o1.getName().compareTo(o2.getName());
+                    }
+                    return req.getSortOrder() == SortOrder.DESC ? result * (-1) : result;
+                })
+                .map(dish -> respMapper.toDishResp(dish, recipeInfoRepository.findById(dish.getIdRecipeInfo())
+                        .orElseGet(RecipeInfo::new)))
+                .collect(Collectors.toList());
     }
 
     @Builder

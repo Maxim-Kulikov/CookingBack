@@ -1,6 +1,7 @@
 package com.example.cooking.dto.dish.req;
 
 import com.example.cooking.dto.ingredient.UsedIngredient;
+import com.example.cooking.dto.photo.Photo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,6 +29,8 @@ public class UpdateDishReq {
     @Min(1)
     @Max(30000)
     private Integer cookingTime;
+
+    private Photo photo;
 
     private List<UsedIngredient> usedIngredients;
 }

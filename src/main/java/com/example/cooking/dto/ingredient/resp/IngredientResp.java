@@ -24,4 +24,6 @@ public class IngredientResp {
 
     private Integer idProductKind;
     private String productKind;
+
+    private String ingredientName;
 }

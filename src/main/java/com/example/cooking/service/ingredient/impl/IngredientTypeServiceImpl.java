@@ -106,7 +106,7 @@ public class IngredientTypeServiceImpl implements IngredientTypeService {
     }
 
     protected void ifIngredientTypeIsExistedThrowException(String type) {
-        Optional<IngredientType> ingredientType = repository.findByType(type);
+        Optional<IngredientType> ingredientType = repository.findByTypeIgnoreCase(type);
         if (ingredientType.isPresent()) {
             throw new IngredientTypeIsExistedException(ingredientType.get().getId(), type);
         }

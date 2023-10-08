@@ -1,6 +1,8 @@
 package com.example.cooking.dto.dish.resp;
 
+import com.example.cooking.dto.ingredient.UsedIngredient;
 import com.example.cooking.dto.ingredient.resp.UsedIngredientResp;
+import com.example.cooking.dto.photo.Photo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,7 +29,6 @@ public class DishResp {
 
     private Integer idUser;
 
-    private String idRecipeInfo;
     private Integer idDishName;
     private String dishName;
 
@@ -36,4 +37,7 @@ public class DishResp {
 
     private Integer idMealTime;
     private String dayPart;
+
+    private List<UsedIngredient> usedIngredients;
+    private Photo photo;
 }

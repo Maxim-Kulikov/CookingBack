@@ -38,7 +38,7 @@ public class DishTypeServiceImpl implements DishTypeService {
     @Override
     @Transactional
     public DishTypeResp save(CreateDishTypeReq req) {
-        ifDishTypeIsExistedThrowException(req.getType());
+        ifDishTypeIsExistedThrowException(req.getType(), req.getIdMealTime());
         MealTime mealTime = mealTimeService.getMealTimeOrThrowException(req.getIdMealTime());
         DishType dishType = dishTypeRepository.save(dishReqMapper.toDishType(req, mealTime));
 
@@ -56,7 +56,7 @@ public class DishTypeServiceImpl implements DishTypeService {
         }
 
         if (!DataValidator.isNullOrEmpty(req.getType()) && !req.getType().equals(dishType.getType())) {
-            ifDishTypeIsExistedThrowException(req.getType());
+            ifDishTypeIsExistedThrowException(req.getType(), req.getIdMealTime());
             dishType.setType(req.getType());
         }
 
@@ -98,8 +98,8 @@ public class DishTypeServiceImpl implements DishTypeService {
                 .orElseThrow(() -> new DishTypeNotFoundException(id));
     }
 
-    protected void ifDishTypeIsExistedThrowException(String type) {
-        Optional<DishType> dishType = dishTypeRepository.findFirstByType(type);
+    protected void ifDishTypeIsExistedThrowException(String type, Integer idMealTime) {
+        Optional<DishType> dishType = dishTypeRepository.findFirstByTypeIgnoreCaseAndMealTimeId(type, idMealTime);
         if (dishType.isPresent()) {
             throw new DishTypeIsExistedException(dishType.get().getId(), type);
         }

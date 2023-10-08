@@ -93,7 +93,7 @@ public class ProductKindServiceImpl implements ProductKindService {
     }
 
     protected void ifProductKindIsExistedThrowException(String kind) {
-        Optional<ProductKind> productKind = repository.findByName(kind);
+        Optional<ProductKind> productKind = repository.findByNameIgnoreCase(kind);
         if (productKind.isPresent()) {
             throw new ProductKindIsExistedException(productKind.get().getId(), kind);
         }

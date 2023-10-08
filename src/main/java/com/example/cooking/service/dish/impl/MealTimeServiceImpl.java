@@ -89,7 +89,7 @@ public class MealTimeServiceImpl implements MealTimeService {
     }
 
     protected void ifMealTimeIsExistedThrowException(String dayPart) {
-        Optional<MealTime> mealTime = repository.findByDayPart(dayPart);
+        Optional<MealTime> mealTime = repository.findByDayPartIgnoreCase(dayPart);
         if (mealTime.isPresent()) {
             throw new MealTimeIsExistedException(mealTime.get().getId(), dayPart);
         }

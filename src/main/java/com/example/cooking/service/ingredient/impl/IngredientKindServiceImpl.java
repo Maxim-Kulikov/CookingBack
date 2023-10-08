@@ -98,7 +98,7 @@ public class IngredientKindServiceImpl implements IngredientKindService {
     }
 
     protected void ifIngredientKindIsExistedThrowException(String kind) {
-        Optional<IngredientKind> ingredientKind = repository.findByKind(kind);
+        Optional<IngredientKind> ingredientKind = repository.findByKindIgnoreCase(kind);
         if (ingredientKind.isPresent()) {
             throw new IngredientKindIsExistedException(ingredientKind.get().getId(), kind);
         }
