@@ -1,6 +1,6 @@
 package com.example.cooking.util;
 
-import com.example.cooking.dto.Query;
+import com.example.cooking.presentation.dto.Query;
 
 import java.util.List;
 
