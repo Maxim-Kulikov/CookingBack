@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface DishRepository extends CrudRepository<Dish, Integer> {
-    List<Dish> findAllByIdUser(int idUser);
+    List<Dish> findAllByUserId(int idUser);
 
     List<Dish> findAllByNameContainsIgnoreCase(String query);
 
@@ -20,7 +20,7 @@ public interface DishRepository extends CrudRepository<Dish, Integer> {
             "and d.fats between :minFats and :maxFats " +
             "and d.carbohydrates between :minCarbohydrates and :maxCarbohydrates " +
             "and d.cookingTime between :minCookingTime and :maxCookingTime " +
-            "and (:userIds is null or d.idUser in :userIds)")
+            "and (:userIds is null or d.user.id in :userIds)")
     List<Dish> findAllWithFilter(@Param("query") String query,
                                  @Param("minCalories") Double minCalories,
                                  @Param("maxCalories") Double maxCalories,

@@ -1,4 +1,4 @@
-package com.example.cooking.presentation.dto.mapper.dish;
+package com.example.cooking.presentation.mapper.dish;
 
 import com.example.cooking.presentation.dto.dish.resp.DishNameResp;
 import com.example.cooking.presentation.dto.dish.resp.DishResp;
@@ -33,7 +33,7 @@ public class DishRespMapper {
                 .id(dish.getId())
                 .name(dish.getName())
                 .cookingTime(dish.getCookingTime())
-                .idUser(dish.getIdUser())
+                .idUser(dish.getUser().getId())
                 .idDishType(dish.getDishName().getDishType().getId())
                 .dishType(dish.getDishName().getDishType().getType())
                 .idDishName(dish.getDishName().getId())

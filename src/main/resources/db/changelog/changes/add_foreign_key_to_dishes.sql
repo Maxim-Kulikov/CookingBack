@@ -1,0 +1,1 @@
+ALTER TABLE dishes ADD CONSTRAINT fk_users_dishes FOREIGN KEY (id_user) REFERENCES users(id);

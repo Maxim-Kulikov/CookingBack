@@ -10,4 +10,8 @@ public class IsExistedException extends RuntimeException {
         super(message);
         this.id = id;
     }
+
+    public IsExistedException(String message) {
+        super(message);
+    }
 }

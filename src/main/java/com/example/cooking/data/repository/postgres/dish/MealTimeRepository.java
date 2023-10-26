@@ -12,5 +12,7 @@ public interface MealTimeRepository extends CrudRepository<MealTime, Integer> {
     Optional<MealTime> findByDayPartIgnoreCase(String dayPart);
 
     List<MealTime> findAllByDayPartContainsIgnoreCase(String dayPart);
+
+    boolean existsByDayPartIgnoreCase(String dayPart);
 }
 

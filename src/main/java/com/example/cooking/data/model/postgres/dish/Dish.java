@@ -1,5 +1,6 @@
 package com.example.cooking.data.model.postgres.dish;
 
+import com.example.cooking.data.model.postgres.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,9 +23,6 @@ public class Dish {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "id_user", nullable = false)
-    private Integer idUser;
-
     @Column(name = "cooking_time", nullable = false)
     private Integer cookingTime;
 
@@ -46,5 +44,9 @@ public class Dish {
     @ManyToOne
     @JoinColumn(name = "id_dish_name", referencedColumnName = "id")
     private DishName dishName;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_user")
+    private User user;
 
 }

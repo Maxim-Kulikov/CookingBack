@@ -10,7 +10,9 @@ import com.example.cooking.data.model.postgres.dish.Dish;
 import java.util.List;
 
 public interface DishService extends MainService<CreateDishReq, UpdateDishReq, DishResp> {
-    List<Dish> getDishesByUserId(int userId);
+    List<DishResp> getDishesByUserId(int userId);
 
     List<DishResp> findAllByFilter(DishFilterReq req);
+
+    void deleteByUserId(Integer id);
 }

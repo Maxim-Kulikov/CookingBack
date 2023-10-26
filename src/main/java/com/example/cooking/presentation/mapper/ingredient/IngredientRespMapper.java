@@ -1,4 +1,4 @@
-package com.example.cooking.presentation.dto.mapper.ingredient;
+package com.example.cooking.presentation.mapper.ingredient;
 
 import com.example.cooking.data.model.postgres.ingredient.Ingredient;
 import com.example.cooking.data.model.postgres.ingredient.IngredientKind;

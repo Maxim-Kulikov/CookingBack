@@ -1,4 +1,4 @@
-package com.example.cooking.presentation.dto.mapper.dish;
+package com.example.cooking.presentation.mapper.dish;
 
 import com.example.cooking.presentation.dto.dish.req.CreateDishNameReq;
 import com.example.cooking.presentation.dto.dish.req.CreateDishTypeReq;

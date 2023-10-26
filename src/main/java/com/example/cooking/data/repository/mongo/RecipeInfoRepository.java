@@ -6,4 +6,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.Optional;
 public interface RecipeInfoRepository extends MongoRepository<RecipeInfo, String> {
     Optional<RecipeInfo> findFirstById(String id);
+
 }

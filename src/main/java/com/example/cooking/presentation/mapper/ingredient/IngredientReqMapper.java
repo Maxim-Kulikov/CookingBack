@@ -1,4 +1,4 @@
-package com.example.cooking.presentation.dto.mapper.ingredient;
+package com.example.cooking.presentation.mapper.ingredient;
 
 import com.example.cooking.presentation.dto.ingredient.req.CreateIngredientKindReq;
 import com.example.cooking.presentation.dto.ingredient.req.CreateIngredientReq;

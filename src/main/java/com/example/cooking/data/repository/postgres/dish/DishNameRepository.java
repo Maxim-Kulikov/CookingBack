@@ -12,4 +12,6 @@ public interface DishNameRepository extends CrudRepository<DishName, Integer> {
     List<DishName> findAllByNameContainsIgnoreCase(String name);
 
     Optional<DishName> findFirstByNameIgnoreCaseAndDishTypeId(String name, Integer dishTypeId);
+
+    boolean existsByNameIgnoreCase(String name);
 }

@@ -7,17 +7,20 @@ import com.example.cooking.data.model.mongo.RecipeInfo;
 import com.example.cooking.data.model.postgres.dish.Dish;
 import com.example.cooking.data.model.postgres.dish.DishName;
 import com.example.cooking.data.model.postgres.ingredient.Ingredient;
+import com.example.cooking.data.model.postgres.user.User;
 import com.example.cooking.data.repository.mongo.RecipeInfoRepository;
 import com.example.cooking.data.repository.postgres.dish.DishRepository;
+import com.example.cooking.data.repository.postgres.user.UserRepository;
 import com.example.cooking.exception.dish.DishNotFoundException;
 import com.example.cooking.exception.dish.RecipeInfoNotFoundException;
+import com.example.cooking.exception.user.UserNotFoundException;
 import com.example.cooking.presentation.dto.Query;
 import com.example.cooking.presentation.dto.dish.req.CreateDishReq;
 import com.example.cooking.presentation.dto.dish.req.DishFilterReq;
 import com.example.cooking.presentation.dto.dish.req.UpdateDishReq;
 import com.example.cooking.presentation.dto.dish.resp.DishResp;
 import com.example.cooking.presentation.dto.ingredient.UsedIngredient;
-import com.example.cooking.presentation.dto.mapper.dish.DishRespMapper;
+import com.example.cooking.presentation.mapper.dish.DishRespMapper;
 import com.example.cooking.util.DataValidator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,6 +50,9 @@ public class DishServiceImpl implements DishService {
     @Autowired
     private DishRespMapper respMapper;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Transactional
     @Override
     public DishResp save(CreateDishReq req) {
@@ -61,7 +67,8 @@ public class DishServiceImpl implements DishService {
         Dish dish = Dish.builder()
                 .name(req.getName())
                 .dishName(dishName)
-                .idUser(req.getIdUser())
+                .user(userRepository.findById(req.getIdUser())
+                        .orElseThrow(() -> new UserNotFoundException(req.getIdUser())))
                 .idRecipeInfo(recipeInfo.getId())
                 .cookingTime(req.getCookingTime())
                 .build();
@@ -87,6 +94,10 @@ public class DishServiceImpl implements DishService {
             recipeInfo.setUsedIngredients(req.getUsedIngredients());
         }
 
+        if (req.getPhoto() != null) {
+            recipeInfo.setPhoto(req.getPhoto());
+        }
+
         if (!DataValidator.isNullOrEmpty(req.getName())) {
             dish.setName(req.getName());
         }
@@ -95,9 +106,9 @@ public class DishServiceImpl implements DishService {
             dish.setCookingTime(req.getCookingTime());
         }
 
-        if (req.getIdUser() != null) {
+        /*if (req.getIdUser() != null) {
             dish.setIdUser(req.getIdUser());
-        }
+        }*/
 
         dishRepository.save(dish);
         recipeInfoRepository.save(recipeInfo);
@@ -115,6 +126,22 @@ public class DishServiceImpl implements DishService {
 
     @Transactional
     @Override
+    public void deleteByUserId(Integer id) {
+        dishRepository.findAllByUserId(id).forEach(dish -> {
+            recipeInfoRepository.deleteById(dish.getIdRecipeInfo());
+            dishRepository.deleteById(dish.getId());
+        });
+    }
+
+    public void deleteByUser(User user) {
+        user.getDishes().forEach(dish -> {
+            recipeInfoRepository.deleteById(dish.getIdRecipeInfo());
+            dishRepository.deleteById(dish.getId());
+        });
+    }
+
+    @Transactional
+    @Override
     public DishResp findById(Integer id) {
         Dish dish = getDishOrThrowException(id);
         RecipeInfo recipeInfo = getRecipeInfoOrThrowException(dish.getIdRecipeInfo());
@@ -127,9 +154,7 @@ public class DishServiceImpl implements DishService {
         return (DataValidator.isObjectOrFieldNull(query) ? (List<Dish>) dishRepository.findAll()
                 : dishRepository.findAllByNameContainsIgnoreCase(query.getQuery()))
                 .stream()
-                .map(dish ->
-                        respMapper.toDishResp(dish,
-                                recipeInfoRepository.findById(dish.getIdRecipeInfo()).orElseGet(RecipeInfo::new)))
+                .map(this::getDishResp)
                 .collect(Collectors.toList());
     }
 
@@ -148,8 +173,14 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
-    public List<Dish> getDishesByUserId(int userId) {
-        return dishRepository.findAllByIdUser(userId);
+    public List<DishResp> getDishesByUserId(int userId) {
+        return dishRepository.findAllByUserId(userId).stream()
+                .map(this::getDishResp)
+                .collect(Collectors.toList());
+    }
+
+    public DishResp getDishResp(Dish dish) {
+        return respMapper.toDishResp(dish, getRecipeInfoOrThrowException(dish.getIdRecipeInfo()));
     }
 
     private void setNutritionalIn100GramsToDish(Dish dish, Nutritional nutritional) {
@@ -173,11 +204,11 @@ public class DishServiceImpl implements DishService {
     @Transactional
     @Override
     public List<DishResp> findAllByFilter(DishFilterReq req) {
-        if(req == null) {
+        if (req == null) {
             return ((List<Dish>) dishRepository.findAll())
                     .stream()
                     .map(dish -> respMapper.toDishResp(dish, recipeInfoRepository.findById(dish.getIdRecipeInfo())
-                    .orElseGet(RecipeInfo::new)))
+                            .orElseGet(RecipeInfo::new)))
                     .collect(Collectors.toList());
         }
         return dishRepository.findAllWithFilter(
