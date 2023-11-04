@@ -1,6 +1,6 @@
 package com.example.cooking.presentation.dto.ingredient.req;
 
-import com.example.cooking.buisness.enums.SortOrder;
+import com.example.cooking.buisness.enums.common.SortOrder;
 import com.example.cooking.buisness.enums.ingredient.SortField;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

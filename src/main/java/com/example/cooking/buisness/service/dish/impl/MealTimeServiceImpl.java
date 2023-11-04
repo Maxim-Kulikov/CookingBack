@@ -1,19 +1,19 @@
 package com.example.cooking.buisness.service.dish.impl;
 
+import com.example.cooking.buisness.service.dish.MealTimeService;
+import com.example.cooking.data.model.postgres.dish.MealTime;
+import com.example.cooking.data.repository.postgres.dish.MealTimeRepository;
+import com.example.cooking.exception.dish.MealTimeIsExistedException;
+import com.example.cooking.exception.dish.MealTimeNotFoundException;
 import com.example.cooking.presentation.dto.Query;
 import com.example.cooking.presentation.dto.dish.req.CreateMealTimeReq;
 import com.example.cooking.presentation.dto.dish.req.UpdateMealTimeReq;
 import com.example.cooking.presentation.dto.dish.resp.DishTypeResp;
 import com.example.cooking.presentation.dto.dish.resp.MealTimeResp;
-import com.example.cooking.exception.dish.MealTimeIsExistedException;
-import com.example.cooking.exception.dish.MealTimeNotFoundException;
 import com.example.cooking.presentation.mapper.dish.DishReqMapper;
 import com.example.cooking.presentation.mapper.dish.DishRespMapper;
-import com.example.cooking.data.model.postgres.dish.MealTime;
-import com.example.cooking.data.repository.postgres.dish.MealTimeRepository;
-import com.example.cooking.buisness.service.dish.MealTimeService;
 import com.example.cooking.util.DataValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,15 +23,11 @@ import java.util.Optional;
 import static com.example.cooking.util.DataValidator.isNullOrEmpty;
 
 @Service
+@RequiredArgsConstructor
 public class MealTimeServiceImpl implements MealTimeService {
-    @Autowired
-    private MealTimeRepository repository;
-
-    @Autowired
-    private DishReqMapper dishReqMapper;
-
-    @Autowired
-    private DishRespMapper dishRespMapper;
+    private final MealTimeRepository repository;
+    private final DishReqMapper dishReqMapper;
+    private final DishRespMapper dishRespMapper;
 
     @Transactional
     @Override

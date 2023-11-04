@@ -1,21 +1,22 @@
 package com.example.cooking.presentation.controller.dish;
 
+import com.example.cooking.buisness.service.dish.MealTimeService;
 import com.example.cooking.presentation.dto.Query;
 import com.example.cooking.presentation.dto.dish.req.CreateMealTimeReq;
 import com.example.cooking.presentation.dto.dish.req.UpdateMealTimeReq;
 import com.example.cooking.presentation.dto.dish.resp.DishTypeResp;
 import com.example.cooking.presentation.dto.dish.resp.MealTimeResp;
-import com.example.cooking.buisness.service.dish.MealTimeService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/meal-times")
+@RequiredArgsConstructor
 public class MealTimeController {
-    @Autowired
-    private MealTimeService mealTimeService;
+
+    private final MealTimeService mealTimeService;
 
     @PostMapping("/save")
     public MealTimeResp save(@RequestBody CreateMealTimeReq dto) {

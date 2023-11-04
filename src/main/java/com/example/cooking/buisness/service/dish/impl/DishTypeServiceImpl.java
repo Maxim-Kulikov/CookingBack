@@ -1,20 +1,20 @@
 package com.example.cooking.buisness.service.dish.impl;
 
 import com.example.cooking.buisness.service.dish.DishTypeService;
+import com.example.cooking.data.model.postgres.dish.DishType;
+import com.example.cooking.data.model.postgres.dish.MealTime;
+import com.example.cooking.data.repository.postgres.dish.DishTypeRepository;
+import com.example.cooking.exception.dish.DishTypeIsExistedException;
+import com.example.cooking.exception.dish.DishTypeNotFoundException;
 import com.example.cooking.presentation.dto.Query;
 import com.example.cooking.presentation.dto.dish.req.CreateDishTypeReq;
 import com.example.cooking.presentation.dto.dish.req.UpdateDishTypeReq;
 import com.example.cooking.presentation.dto.dish.resp.DishNameResp;
 import com.example.cooking.presentation.dto.dish.resp.DishTypeResp;
-import com.example.cooking.exception.dish.DishTypeIsExistedException;
-import com.example.cooking.exception.dish.DishTypeNotFoundException;
 import com.example.cooking.presentation.mapper.dish.DishReqMapper;
 import com.example.cooking.presentation.mapper.dish.DishRespMapper;
-import com.example.cooking.data.model.postgres.dish.DishType;
-import com.example.cooking.data.model.postgres.dish.MealTime;
-import com.example.cooking.data.repository.postgres.dish.DishTypeRepository;
 import com.example.cooking.util.DataValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,18 +22,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class DishTypeServiceImpl implements DishTypeService {
-    @Autowired
-    private MealTimeServiceImpl mealTimeService;
-
-    @Autowired
-    private DishTypeRepository dishTypeRepository;
-
-    @Autowired
-    private DishReqMapper dishReqMapper;
-
-    @Autowired
-    private DishRespMapper dishRespMapper;
+    private final MealTimeServiceImpl mealTimeService;
+    private final DishTypeRepository dishTypeRepository;
+    private final DishReqMapper dishReqMapper;
+    private final DishRespMapper dishRespMapper;
 
     @Override
     @Transactional

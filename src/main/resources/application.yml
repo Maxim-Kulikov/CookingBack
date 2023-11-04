@@ -1,4 +1,5 @@
 server:
+  shutdown: graceful
   port: 8080
 
 spring:
@@ -20,5 +21,3 @@ spring:
     password: pass
   liquibase:
     change-log: classpath:/db/db.changelog-master.yaml
-
-

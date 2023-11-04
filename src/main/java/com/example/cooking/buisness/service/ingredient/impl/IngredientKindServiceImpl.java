@@ -14,7 +14,7 @@ import com.example.cooking.presentation.dto.ingredient.resp.IngredientTypeResp;
 import com.example.cooking.presentation.mapper.ingredient.IngredientReqMapper;
 import com.example.cooking.presentation.mapper.ingredient.IngredientRespMapper;
 import com.example.cooking.util.DataValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,18 +22,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class IngredientKindServiceImpl implements IngredientKindService {
-    @Autowired
-    private IngredientKindRepository repository;
-
-    @Autowired
-    private ProductKindServiceImpl productKindService;
-
-    @Autowired
-    private IngredientReqMapper reqMapper;
-
-    @Autowired
-    private IngredientRespMapper respMapper;
+    private final IngredientKindRepository repository;
+    private final ProductKindServiceImpl productKindService;
+    private final IngredientReqMapper reqMapper;
+    private final IngredientRespMapper respMapper;
 
     @Transactional
     @Override

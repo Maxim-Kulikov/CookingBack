@@ -1,12 +1,12 @@
 package com.example.cooking.presentation.controller.ingredient;
 
+import com.example.cooking.buisness.service.ingredient.IngredientTypeService;
 import com.example.cooking.presentation.dto.Query;
 import com.example.cooking.presentation.dto.ingredient.req.CreateIngredientTypeReq;
 import com.example.cooking.presentation.dto.ingredient.req.UpdateIngredientTypeReq;
 import com.example.cooking.presentation.dto.ingredient.resp.IngredientResp;
 import com.example.cooking.presentation.dto.ingredient.resp.IngredientTypeResp;
-import com.example.cooking.buisness.service.ingredient.IngredientTypeService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,10 +14,11 @@ import java.util.List;
 
 @Validated
 @RestController
-@RequestMapping("/ingredients/types")
+@RequestMapping("/ingredient-types")
+@RequiredArgsConstructor
 public class IngredientTypeController {
-    @Autowired
-    private IngredientTypeService service;
+
+    private final IngredientTypeService service;
 
     @PostMapping("/save")
     public IngredientTypeResp save(@RequestBody CreateIngredientTypeReq req) {

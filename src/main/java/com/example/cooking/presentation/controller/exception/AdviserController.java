@@ -1,4 +1,4 @@
-package com.example.cooking.presentation.controller;
+package com.example.cooking.presentation.controller.exception;
 
 import com.example.cooking.exception.IsExistedException;
 import com.example.cooking.exception.NotFoundException;

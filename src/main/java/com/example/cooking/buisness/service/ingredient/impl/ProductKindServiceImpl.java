@@ -1,19 +1,19 @@
 package com.example.cooking.buisness.service.ingredient.impl;
 
 import com.example.cooking.buisness.service.ingredient.ProductKindService;
+import com.example.cooking.data.model.postgres.ingredient.ProductKind;
+import com.example.cooking.data.repository.postgres.ingredient.ProductKindRepository;
+import com.example.cooking.exception.ingredient.ProductKindIsExistedException;
+import com.example.cooking.exception.ingredient.ProductKindNotFoundException;
 import com.example.cooking.presentation.dto.Query;
 import com.example.cooking.presentation.dto.ingredient.req.CreateProductKindReq;
 import com.example.cooking.presentation.dto.ingredient.req.UpdateProductKindReq;
 import com.example.cooking.presentation.dto.ingredient.resp.IngredientKindResp;
 import com.example.cooking.presentation.dto.ingredient.resp.ProductKindResp;
-import com.example.cooking.exception.ingredient.ProductKindIsExistedException;
-import com.example.cooking.exception.ingredient.ProductKindNotFoundException;
 import com.example.cooking.presentation.mapper.ingredient.IngredientReqMapper;
 import com.example.cooking.presentation.mapper.ingredient.IngredientRespMapper;
-import com.example.cooking.data.model.postgres.ingredient.ProductKind;
-import com.example.cooking.data.repository.postgres.ingredient.ProductKindRepository;
 import com.example.cooking.util.DataValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,15 +21,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ProductKindServiceImpl implements ProductKindService {
-    @Autowired
-    private ProductKindRepository repository;
-
-    @Autowired
-    private IngredientReqMapper reqMapper;
-
-    @Autowired
-    private IngredientRespMapper respMapper;
+    private final ProductKindRepository repository;
+    private final IngredientReqMapper reqMapper;
+    private final IngredientRespMapper respMapper;
 
     @Transactional
     @Override

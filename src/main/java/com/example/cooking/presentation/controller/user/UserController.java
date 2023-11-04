@@ -3,22 +3,23 @@ package com.example.cooking.presentation.controller.user;
 import com.example.cooking.buisness.service.user.UserService;
 import com.example.cooking.presentation.dto.Query;
 import com.example.cooking.presentation.dto.dish.resp.DishResp;
-import com.example.cooking.presentation.dto.user.CreateUserReq;
 import com.example.cooking.presentation.dto.user.UpdateUserReq;
+import com.example.cooking.presentation.dto.user.UserCredentialsReq;
 import com.example.cooking.presentation.dto.user.UserResp;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
-    @Autowired
-    private UserService userService;
+
+    private final UserService userService;
 
     @PostMapping("/save")
-    public UserResp save(@RequestBody CreateUserReq req) {
+    public UserResp save(@RequestBody UserCredentialsReq req) {
         return userService.save(req);
     }
 
@@ -37,7 +38,7 @@ public class UserController {
         return userService.update(id, req);
     }
 
-    @PatchMapping("/{id}/set/role/{id-role}")
+    @PatchMapping("/{id}/set-role/{id-role}")
     public UserResp setRole(@PathVariable int id, @PathVariable("id-role") int idRole) {
         return userService.setRole(id, idRole);
     }

@@ -1,20 +1,20 @@
 package com.example.cooking.buisness.service.ingredient.impl;
 
 import com.example.cooking.buisness.service.ingredient.IngredientTypeService;
+import com.example.cooking.data.model.postgres.ingredient.IngredientKind;
+import com.example.cooking.data.model.postgres.ingredient.IngredientType;
+import com.example.cooking.data.repository.postgres.ingredient.IngredientTypeRepository;
+import com.example.cooking.exception.ingredient.IngredientTypeIsExistedException;
+import com.example.cooking.exception.ingredient.IngredientTypeNotFoundException;
 import com.example.cooking.presentation.dto.Query;
 import com.example.cooking.presentation.dto.ingredient.req.CreateIngredientTypeReq;
 import com.example.cooking.presentation.dto.ingredient.req.UpdateIngredientTypeReq;
 import com.example.cooking.presentation.dto.ingredient.resp.IngredientResp;
 import com.example.cooking.presentation.dto.ingredient.resp.IngredientTypeResp;
-import com.example.cooking.exception.ingredient.IngredientTypeIsExistedException;
-import com.example.cooking.exception.ingredient.IngredientTypeNotFoundException;
 import com.example.cooking.presentation.mapper.ingredient.IngredientReqMapper;
 import com.example.cooking.presentation.mapper.ingredient.IngredientRespMapper;
-import com.example.cooking.data.model.postgres.ingredient.IngredientKind;
-import com.example.cooking.data.model.postgres.ingredient.IngredientType;
-import com.example.cooking.data.repository.postgres.ingredient.IngredientTypeRepository;
 import com.example.cooking.util.DataValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,18 +22,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class IngredientTypeServiceImpl implements IngredientTypeService {
-    @Autowired
-    private IngredientTypeRepository repository;
-
-    @Autowired
-    private IngredientKindServiceImpl ingredientKindService;
-
-    @Autowired
-    private IngredientReqMapper reqMapper;
-
-    @Autowired
-    private IngredientRespMapper respMapper;
+    private final IngredientTypeRepository repository;
+    private final IngredientKindServiceImpl ingredientKindService;
+    private final IngredientReqMapper reqMapper;
+    private final IngredientRespMapper respMapper;
 
     @Transactional
     @Override

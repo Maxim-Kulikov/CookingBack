@@ -1,6 +1,6 @@
 package com.example.cooking.buisness.service.dish.impl;
 
-import com.example.cooking.buisness.enums.SortOrder;
+import com.example.cooking.buisness.enums.common.SortOrder;
 import com.example.cooking.buisness.service.dish.DishService;
 import com.example.cooking.buisness.service.ingredient.impl.IngredientServiceImpl;
 import com.example.cooking.data.model.mongo.RecipeInfo;
@@ -25,7 +25,7 @@ import com.example.cooking.util.DataValidator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,24 +34,14 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class DishServiceImpl implements DishService {
-    @Autowired
-    private DishRepository dishRepository;
-
-    @Autowired
-    private IngredientServiceImpl ingredientService;
-
-    @Autowired
-    private RecipeInfoRepository recipeInfoRepository;
-
-    @Autowired
-    private DishNameServiceImpl dishNameService;
-
-    @Autowired
-    private DishRespMapper respMapper;
-
-    @Autowired
-    private UserRepository userRepository;
+    private final DishRepository dishRepository;
+    private final IngredientServiceImpl ingredientService;
+    private final RecipeInfoRepository recipeInfoRepository;
+    private final DishNameServiceImpl dishNameService;
+    private final DishRespMapper respMapper;
+    private final UserRepository userRepository;
 
     @Transactional
     @Override
@@ -106,10 +96,6 @@ public class DishServiceImpl implements DishService {
             dish.setCookingTime(req.getCookingTime());
         }
 
-        /*if (req.getIdUser() != null) {
-            dish.setIdUser(req.getIdUser());
-        }*/
-
         dishRepository.save(dish);
         recipeInfoRepository.save(recipeInfo);
 
@@ -122,15 +108,6 @@ public class DishServiceImpl implements DishService {
         String recipeInfoId = getDishOrThrowException(id).getIdRecipeInfo();
         dishRepository.deleteById(id);
         recipeInfoRepository.deleteById(recipeInfoId);
-    }
-
-    @Transactional
-    @Override
-    public void deleteByUserId(Integer id) {
-        dishRepository.findAllByUserId(id).forEach(dish -> {
-            recipeInfoRepository.deleteById(dish.getIdRecipeInfo());
-            dishRepository.deleteById(dish.getId());
-        });
     }
 
     public void deleteByUser(User user) {
@@ -170,13 +147,6 @@ public class DishServiceImpl implements DishService {
 
     private RecipeInfo getRecipeInfoOrThrowException(String id) {
         return recipeInfoRepository.findById(id).orElseThrow(() -> new RecipeInfoNotFoundException(id));
-    }
-
-    @Override
-    public List<DishResp> getDishesByUserId(int userId) {
-        return dishRepository.findAllByUserId(userId).stream()
-                .map(this::getDishResp)
-                .collect(Collectors.toList());
     }
 
     public DishResp getDishResp(Dish dish) {
@@ -220,7 +190,7 @@ public class DishServiceImpl implements DishService {
                 )
                 .stream()
                 .sorted((o1, o2) -> {
-                    int result = 0;
+                    int result;
                     switch (req.getSortField()) {
                         case CALORIES -> result = o1.getCalories().compareTo(o2.getCalories());
                         case PROTEINS -> result = o1.getProteins().compareTo(o2.getProteins());

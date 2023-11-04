@@ -1,22 +1,22 @@
 package com.example.cooking.buisness.service.dish.impl;
 
 import com.example.cooking.buisness.service.dish.DishNameService;
-import com.example.cooking.presentation.dto.Query;
-import com.example.cooking.presentation.dto.dish.req.CreateDishNameReq;
-import com.example.cooking.presentation.dto.dish.req.UpdateDishNameReq;
-import com.example.cooking.presentation.dto.dish.resp.DishNameResp;
-import com.example.cooking.presentation.dto.dish.resp.DishResp;
-import com.example.cooking.exception.dish.DishNameIsExistedException;
-import com.example.cooking.exception.dish.DishNameNotFoundException;
-import com.example.cooking.presentation.mapper.dish.DishReqMapper;
-import com.example.cooking.presentation.mapper.dish.DishRespMapper;
 import com.example.cooking.data.model.mongo.RecipeInfo;
 import com.example.cooking.data.model.postgres.dish.DishName;
 import com.example.cooking.data.model.postgres.dish.DishType;
 import com.example.cooking.data.repository.mongo.RecipeInfoRepository;
 import com.example.cooking.data.repository.postgres.dish.DishNameRepository;
+import com.example.cooking.exception.dish.DishNameIsExistedException;
+import com.example.cooking.exception.dish.DishNameNotFoundException;
+import com.example.cooking.presentation.dto.Query;
+import com.example.cooking.presentation.dto.dish.req.CreateDishNameReq;
+import com.example.cooking.presentation.dto.dish.req.UpdateDishNameReq;
+import com.example.cooking.presentation.dto.dish.resp.DishNameResp;
+import com.example.cooking.presentation.dto.dish.resp.DishResp;
+import com.example.cooking.presentation.mapper.dish.DishReqMapper;
+import com.example.cooking.presentation.mapper.dish.DishRespMapper;
 import com.example.cooking.util.DataValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,21 +25,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class DishNameServiceImpl implements DishNameService {
-    @Autowired
-    private DishNameRepository repository;
 
-    @Autowired
-    private RecipeInfoRepository recipeInfoRepository;
-
-    @Autowired
-    private DishTypeServiceImpl dishTypeService;
-
-    @Autowired
-    private DishRespMapper respMapper;
-
-    @Autowired
-    private DishReqMapper reqMapper;
+    private final DishNameRepository repository;
+    private final RecipeInfoRepository recipeInfoRepository;
+    private final DishTypeServiceImpl dishTypeService;
+    private final DishRespMapper respMapper;
+    private final DishReqMapper reqMapper;
 
     @Transactional
     @Override

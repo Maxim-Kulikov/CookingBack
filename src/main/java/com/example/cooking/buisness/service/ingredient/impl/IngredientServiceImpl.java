@@ -1,6 +1,6 @@
 package com.example.cooking.buisness.service.ingredient.impl;
 
-import com.example.cooking.buisness.enums.SortOrder;
+import com.example.cooking.buisness.enums.common.SortOrder;
 import com.example.cooking.buisness.service.ingredient.IngredientService;
 import com.example.cooking.data.model.postgres.ingredient.Ingredient;
 import com.example.cooking.data.model.postgres.ingredient.IngredientType;
@@ -14,7 +14,7 @@ import com.example.cooking.presentation.dto.ingredient.resp.IngredientResp;
 import com.example.cooking.presentation.mapper.ingredient.IngredientReqMapper;
 import com.example.cooking.presentation.mapper.ingredient.IngredientRespMapper;
 import com.example.cooking.util.DataValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,18 +22,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class IngredientServiceImpl implements IngredientService {
-    @Autowired
-    private IngredientRepository repository;
-
-    @Autowired
-    private IngredientTypeServiceImpl ingredientTypeService;
-
-    @Autowired
-    private IngredientReqMapper reqMapper;
-
-    @Autowired
-    private IngredientRespMapper respMapper;
+    private final IngredientRepository repository;
+    private final IngredientTypeServiceImpl ingredientTypeService;
+    private final IngredientReqMapper reqMapper;
+    private final IngredientRespMapper respMapper;
 
     @Transactional
     @Override
@@ -116,7 +110,7 @@ public class IngredientServiceImpl implements IngredientService {
                         filter.getMinCarbohydrates(), filter.getMaxCarbohydrates())
                 .stream()
                 .sorted(((o1, o2) -> {
-                    int result = 0;
+                    int result;
                     switch (filter.getSortField()) {
                         case CALORIES -> result = o1.getCalories().compareTo(o2.getCalories());
                         case PROTEINS -> result = o1.getProteins().compareTo(o2.getProteins());
@@ -126,7 +120,7 @@ public class IngredientServiceImpl implements IngredientService {
                     }
                     return filter.getSortOrder() == SortOrder.DESC ? result * (-1) : result;
                 }))
-                .map(ingredient -> respMapper.toIngredientResp(ingredient))
+                .map(respMapper::toIngredientResp)
                 .collect(Collectors.toList());
     }
 

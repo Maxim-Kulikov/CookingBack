@@ -1,21 +1,21 @@
 package com.example.cooking.presentation.controller.ingredient;
 
-import com.example.cooking.presentation.dto.Query;
+import com.example.cooking.buisness.service.ingredient.IngredientService;
 import com.example.cooking.presentation.dto.ingredient.req.CreateIngredientReq;
 import com.example.cooking.presentation.dto.ingredient.req.IngredientFilterReq;
 import com.example.cooking.presentation.dto.ingredient.req.UpdateIngredientReq;
 import com.example.cooking.presentation.dto.ingredient.resp.IngredientResp;
-import com.example.cooking.buisness.service.ingredient.IngredientService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/ingredients")
+@RequiredArgsConstructor
 public class IngredientController {
-    @Autowired
-    private IngredientService ingredientService;
+
+    private final IngredientService ingredientService;
 
     @PostMapping("/save")
     public IngredientResp save(@RequestBody CreateIngredientReq req) {

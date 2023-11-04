@@ -1,21 +1,21 @@
 package com.example.cooking.presentation.controller.dish;
 
+import com.example.cooking.buisness.service.dish.DishTypeService;
 import com.example.cooking.presentation.dto.Query;
 import com.example.cooking.presentation.dto.dish.req.CreateDishTypeReq;
 import com.example.cooking.presentation.dto.dish.req.UpdateDishTypeReq;
 import com.example.cooking.presentation.dto.dish.resp.DishNameResp;
 import com.example.cooking.presentation.dto.dish.resp.DishTypeResp;
-import com.example.cooking.buisness.service.dish.DishTypeService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/dishes/types")
+@RequestMapping("/dish-types")
+@RequiredArgsConstructor
 public class DishTypeController {
-    @Autowired
-    private DishTypeService dishTypeService;
+    private final DishTypeService dishTypeService;
 
     @PostMapping("/save")
     public DishTypeResp save(@RequestBody CreateDishTypeReq dto) {

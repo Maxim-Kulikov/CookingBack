@@ -1,12 +1,12 @@
 package com.example.cooking.presentation.controller.ingredient;
 
+import com.example.cooking.buisness.service.ingredient.ProductKindService;
 import com.example.cooking.presentation.dto.Query;
 import com.example.cooking.presentation.dto.ingredient.req.CreateProductKindReq;
 import com.example.cooking.presentation.dto.ingredient.req.UpdateProductKindReq;
 import com.example.cooking.presentation.dto.ingredient.resp.IngredientKindResp;
 import com.example.cooking.presentation.dto.ingredient.resp.ProductKindResp;
-import com.example.cooking.buisness.service.ingredient.ProductKindService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,10 +14,11 @@ import java.util.List;
 
 @Validated
 @RestController
-@RequestMapping("/ingredients/product-kinds")
+@RequestMapping("/product-kinds")
+@RequiredArgsConstructor
 public class ProductKindController {
-    @Autowired
-    private ProductKindService service;
+
+    private final ProductKindService service;
 
     @PostMapping("/save")
     public ProductKindResp save(@RequestBody CreateProductKindReq req) {

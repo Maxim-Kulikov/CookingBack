@@ -3,7 +3,6 @@ package com.example.cooking.buisness.service.user.impl;
 import com.example.cooking.buisness.service.dish.impl.DishServiceImpl;
 import com.example.cooking.buisness.service.user.UserService;
 import com.example.cooking.data.model.postgres.user.User;
-import com.example.cooking.data.repository.mongo.RecipeInfoRepository;
 import com.example.cooking.data.repository.postgres.user.RoleRepository;
 import com.example.cooking.data.repository.postgres.user.UserRepository;
 import com.example.cooking.exception.user.RoleNotFoundException;
@@ -11,13 +10,12 @@ import com.example.cooking.exception.user.UserByLoginIsExistedException;
 import com.example.cooking.exception.user.UserNotFoundException;
 import com.example.cooking.presentation.dto.Query;
 import com.example.cooking.presentation.dto.dish.resp.DishResp;
-import com.example.cooking.presentation.dto.user.CreateUserReq;
 import com.example.cooking.presentation.dto.user.UpdateUserReq;
+import com.example.cooking.presentation.dto.user.UserCredentialsReq;
 import com.example.cooking.presentation.dto.user.UserResp;
-import com.example.cooking.presentation.mapper.dish.DishRespMapper;
 import com.example.cooking.presentation.mapper.user.UserMapper;
 import com.example.cooking.util.DataValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,29 +28,21 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService, UserDetailsService {
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private DishServiceImpl dishService;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final DishServiceImpl dishService;
 
     @Transactional
     @Override
-    public UserResp save(CreateUserReq req) {
+    public UserResp save(UserCredentialsReq req) {
         ifUserIsExistedThenThrowException(req.getLogin());
-        req.setPassword(passwordEncoder.encode(req.getPassword()));
 
         User user = userMapper.toUser(req);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         setRole(user, 2);
         user.setUserBlocked(false);
 
@@ -119,7 +109,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public List<DishResp> getDishesByUserId(int idUser) {
         return getUserOrThrowException(idUser).getDishes()
                 .stream()
-                .map(dish -> dishService.getDishResp(dish))
+                .map(dishService::getDishResp)
                 .collect(Collectors.toList());
     }
 
@@ -128,7 +118,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> userOptional = userRepository.findUserByLoginIgnoreCase(username);
         if (userOptional.isEmpty()) {
-            throw new UsernameNotFoundException(username);
+            throw new UserNotFoundException(username);
         }
         return userOptional.map(user -> org.springframework.security.core.userdetails.User.builder()
                         .username(user.getLogin())
